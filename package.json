@@ -1,0 +1,60 @@
+{
+    "name": "assesment",
+    "version": "0.0.1",
+    "bin": {
+        "app": "app/backend/dist/main.js"
+    },
+    "description": "",
+    "author": "",
+    "private": true,
+    "license": "UNLICENSED",
+    "workspaces": [
+        "backend/backend",
+        "backend/client"
+    ],
+    "scripts": {
+        "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+        "start:backend:dev": "cd app/backend && yarn start:dev",
+        "start:frontend:dev": "cd app/frontend && yarn dev",
+        "start:dev:all": "concurrently \"yarn start:backend:dev\" \"yarn start:frontend:dev\"",
+        "docker-compose": "docker-compose -f build/docker/docker-compose.yml",
+        "docker-compose:dev": "docker-compose -f build/docker/docker-compose.yml -f build/docker/docker-compose.dev.yml"
+    },
+    "dependencies": {
+        "concurrently": "^8.2.2",
+        "pkg": "^5.8.1"
+    },
+    "devDependencies": {
+        "cross-env": "^7.0.3",
+        "ts-node": "^10.9.2"
+    },
+    "jest": {
+        "moduleFileExtensions": [
+            "js",
+            "json",
+            "ts"
+        ],
+        "rootDir": "src",
+        "testRegex": ".*\\.spec\\.ts$",
+        "transform": {
+            "^.+\\.(t|j)s$": "ts-jest"
+        },
+        "collectCoverageFrom": [
+            "**/*.(t|j)s"
+        ],
+        "moduleNameMapper": {
+            "^src/(.*)$": "<rootDir>/$1"
+        },
+        "coverageDirectory": "../coverage",
+        "testEnvironment": "node"
+    },
+    "pkg": {
+        "scripts": "app/backend/dist/**/*.js",
+        "assets": [
+            "app/backend/dist/public/**/*",
+            "node_modules/@nestjs/swagger/**/*",
+            "node_modules/swagger-ui-dist/**/*"
+        ],
+        "outputPath": "bin"
+    }
+}
