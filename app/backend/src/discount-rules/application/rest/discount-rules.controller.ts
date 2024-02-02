@@ -8,8 +8,11 @@ import {
   Put,
 } from '@nestjs/common';
 import { DiscountRulesService } from '../../domain/discount-rules.service';
-import { DiscountRuleDto } from './discount-rules.request';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  CreateDiscountRuleDto,
+  UpdateDiscountRuleDto,
+} from './discount-rules.request';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller()
 @ApiTags('Discount Rules')
@@ -17,8 +20,15 @@ export class DiscountRulesController {
   constructor(private readonly discountRulesService: DiscountRulesService) {}
 
   @Post('/products/:product_id/discount-rules')
-  create(@Body() createDiscountRuleDto: DiscountRuleDto) {
-    return this.discountRulesService.create(createDiscountRuleDto);
+  @ApiBearerAuth()
+  create(
+    @Param('product_id') product_id: string,
+    @Body() createDiscountRuleDto: CreateDiscountRuleDto,
+  ) {
+    return this.discountRulesService.create({
+      ...createDiscountRuleDto,
+      product_id: +product_id,
+    });
   }
 
   @Get('/discount-rules')
@@ -32,12 +42,16 @@ export class DiscountRulesController {
   }
 
   @Put('/products/:product_id/discount-rules/:id')
+  @ApiBearerAuth()
   update(
     @Param('product_id') product_id: string,
     @Param('id') id: string,
-    @Body() updateDiscountRuleDto: DiscountRuleDto,
+    @Body() updateDiscountRuleDto: UpdateDiscountRuleDto,
   ) {
-    return this.discountRulesService.update(+id, updateDiscountRuleDto);
+    return this.discountRulesService.update(+id, {
+      ...updateDiscountRuleDto,
+      product_id: +product_id,
+    });
   }
 
   @Delete('/discount-rules/:id')

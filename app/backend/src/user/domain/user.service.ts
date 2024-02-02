@@ -77,7 +77,7 @@ export class UserService {
 
   private async validateUser(username: string, password: string): Promise<any> {
     // Check if the user exists in Supabase or your user database
-    const user = await this.findUserByUsername(username);
+    const user = await this.findUserByUsername(username, true);
 
     if (user && user.password === password) {
       const { ...result } = user;
