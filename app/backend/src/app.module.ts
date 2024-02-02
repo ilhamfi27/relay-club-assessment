@@ -14,6 +14,7 @@ import { AuthMiddleware } from './user/application/middleware/user.middleware';
 import { UserService } from './user/domain/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { CartModule } from './cart/cart.module';
+import { DiscountRulesModule } from './discount-rules/discount-rules.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CartModule } from './cart/cart.module';
     SupabaseModule,
     UserModule,
     CartModule,
+    DiscountRulesModule,
   ],
   controllers: [],
   providers: [UserService, JwtService],
