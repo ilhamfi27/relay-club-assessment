@@ -3,7 +3,7 @@ import { AsyncLocalStorage } from 'async_hooks';
 import { UserEntity } from '@/user/model/entity/user.entity';
 
 export interface Context {
-  user?: UserEntity;
+  user?: Omit<UserEntity, 'password'>;
 }
 
 export class RequestContext {

@@ -50,11 +50,10 @@ export class UserService {
 
   async verifyToken(token: string) {
     const decoded = this.jwtService.decode(token);
-
     if (!decoded) {
       throw new UnauthorizedException();
     }
-    return decoded;
+    return this.findUserByUsername(decoded.username);
   }
 
   private async findUserByUsername(username: string, showPassword = false) {

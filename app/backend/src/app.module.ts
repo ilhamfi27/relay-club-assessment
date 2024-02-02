@@ -13,6 +13,7 @@ import { RouteInfo } from '@nestjs/common/interfaces';
 import { AuthMiddleware } from './user/application/middleware/user.middleware';
 import { UserService } from './user/domain/user.service';
 import { JwtService } from '@nestjs/jwt';
+import { CartModule } from './cart/cart.module';
 
 @Module({
   imports: [
@@ -20,13 +21,14 @@ import { JwtService } from '@nestjs/jwt';
     ProductModule,
     SupabaseModule,
     UserModule,
+    CartModule,
   ],
   controllers: [],
   providers: [UserService, JwtService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    const paths = ['products', 'products/**'];
+    const paths = ['products', 'products/**', 'carts', 'carts/**'];
     const forRoutes: RouteInfo[] = paths.flatMap((path) => {
       const methods = [
         RequestMethod.POST,
@@ -39,6 +41,7 @@ export class AppModule implements NestModule {
 
     const specificRoutes: RouteInfo[] = [
       { method: RequestMethod.GET, path: 'users/me' },
+      { method: RequestMethod.GET, path: 'carts' },
     ];
 
     const specificExcludedRoutes: RouteInfo[] = [
