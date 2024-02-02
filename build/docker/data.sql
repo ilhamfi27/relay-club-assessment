@@ -18,7 +18,7 @@ create table users (
 
   primary key (id),
   unique(username)
-)
+);
 
 CREATE TABLE carts (
   id serial PRIMARY KEY,
@@ -43,3 +43,7 @@ insert into products (sku, name, price) values
   ('mbp', 'MacBook Pro', 1399.99),
   ('atv', 'Apple TV', 109.50),
   ('vga', 'VGA adapter', 30.00);
+
+insert into users (username, password, name) values 
+  ('admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'Admin'),
+  ('ilham', 'e467a85cdae98a0cb4edb5570aad4bd093dc2b652b6677a5949bd4ae36922bb4', 'Ilham');
