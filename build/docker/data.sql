@@ -18,33 +18,35 @@ create table users (
   unique(username)
 );
 
-CREATE TABLE carts (
+create table carts (
   id serial PRIMARY KEY,
   user_id bigint REFERENCES users DEFAULT NULL,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE carts_products (
+create table carts_products (
   cart_id integer REFERENCES carts,
   product_id bigint REFERENCES products,
   quantity integer,
   PRIMARY KEY (cart_id, product_id)
 );
 
-CREATE TYPE rule_type_enum AS ENUM (
+create type rule_type_enum as enum (
   'BUY_X_GET_Y_FREE',
   'BULK_PURCHASE_DISCOUNT',
   'FREE_PRODUCT'
 );
 
-CREATE TABLE discount_rules (
+create table discount_rules (
   id SERIAL PRIMARY KEY,
   product_id INTEGER REFERENCES products(id),
   rule_type rule_type_enum,
   quantity INTEGER,
   discount_value DOUBLE PRECISION,
-  discount_product_id INTEGER REFERENCES products(id)
+  discount_product_id INTEGER REFERENCES products(id),
+  CONSTRAINT fk_discount_rules_product_id FOREIGN KEY (product_id) REFERENCES products(id),
+  CONSTRAINT fk_discount_rules_discount_product_id FOREIGN KEY (discount_product_id) REFERENCES products(id)
 );
 
 alter table

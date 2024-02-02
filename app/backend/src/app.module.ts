@@ -44,6 +44,7 @@ export class AppModule implements NestModule {
     const specificRoutes: RouteInfo[] = [
       { method: RequestMethod.GET, path: 'users/me' },
       { method: RequestMethod.GET, path: 'carts' },
+      { method: RequestMethod.GET, path: 'carts/checkout' },
     ];
 
     const specificExcludedRoutes: RouteInfo[] = [

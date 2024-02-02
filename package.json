@@ -14,7 +14,7 @@
     ],
     "scripts": {
         "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-        "start:backend:dev": "cd app/backend && yarn start:dev",
+        "start:backend:dev": "cd app/backend && yarn start:debug",
         "start:frontend:dev": "cd app/frontend && yarn dev",
         "start:dev:all": "concurrently \"yarn start:backend:dev\" \"yarn start:frontend:dev\"",
         "docker-compose": "docker-compose -f build/docker/docker-compose.yml",

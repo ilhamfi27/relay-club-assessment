@@ -10,14 +10,20 @@ export class CartController {
 
   @Get('')
   @ApiBearerAuth()
-  async getCart(): Promise<any> {
-    return await this.cartService.getCart();
+  getCart() {
+    return this.cartService.getCart();
   }
 
   @Put('/products')
   @ApiBearerAuth()
-  async addToCart(@Body() addToCartDto: AddToCartDto): Promise<any> {
+  addToCart(@Body() addToCartDto: AddToCartDto) {
     const { productId, quantity } = addToCartDto;
-    return await this.cartService.addToCart({ productId, quantity });
+    return this.cartService.addToCart({ productId, quantity });
+  }
+
+  @Get('/checkout')
+  @ApiBearerAuth()
+  checkout() {
+    return this.cartService.checkout();
   }
 }
