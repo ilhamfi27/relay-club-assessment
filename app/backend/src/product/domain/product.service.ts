@@ -20,7 +20,7 @@ export class ProductService {
     return data;
   }
   async findAll() {
-    const data = await this.supabase.from('products').select('*');
+    const { data } = await this.supabase.from('products').select('*');
 
     return data;
   }

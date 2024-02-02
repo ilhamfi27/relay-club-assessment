@@ -9,15 +9,19 @@ import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
+import Button from '@mui/material/Button';
 import MenuIcon from '@mui/icons-material/Menu';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import LogoutIcon from '@mui/icons-material/Logout';
 import HomeIcon from '@mui/icons-material/Home';
-import { FC, ReactNode, useState } from 'react';
+import DiscountIcon from '@mui/icons-material/Discount';
+import { FC, ReactNode, useContext, useState } from 'react';
 import SidebarItem from '@/components/ListItem/SidebarItem';
 import Link from 'next/link';
+import { AuthContext } from '@/context/Auth';
+import { useRouter } from 'next/navigation';
 
 const drawerWidth = 240;
 
@@ -76,8 +80,11 @@ type MainLayoutProps = {
 
 const MainLayout: FC<MainLayoutProps> = ({ children }) => {
   const theme = useTheme();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const { token, setToken } = useContext(AuthContext);
+
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -93,6 +100,16 @@ const MainLayout: FC<MainLayoutProps> = ({ children }) => {
   const handleDrawerClose = () => {
     setOpen(false);
   };
+
+  const handleLogout = () => {
+    localStorage.removeItem('userToken');
+    setOpen(false);
+    setToken(null);
+  };
+
+  if (!token) {
+    return <Box sx={{ display: 'flex' }}>{children}</Box>;
+  }
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -144,10 +161,15 @@ const MainLayout: FC<MainLayoutProps> = ({ children }) => {
           <Link href={'/products'} onClick={handleDrawerClose}>
             <SidebarItem text="Products" icon={<InventoryIcon />} />
           </Link>
-          <Divider />
-          <Link href={'/'} onClick={handleDrawerClose}>
-            <SidebarItem text="Logout" icon={<LogoutIcon />} />
+          <Link href={'/discount-rules'} onClick={handleDrawerClose}>
+            <SidebarItem text="Discount Rules" icon={<DiscountIcon />} />
           </Link>
+          <Divider />
+          <SidebarItem
+            text="Logout"
+            icon={<LogoutIcon />}
+            onClick={handleLogout}
+          />
         </List>
       </Drawer>
       <Main open={open}>

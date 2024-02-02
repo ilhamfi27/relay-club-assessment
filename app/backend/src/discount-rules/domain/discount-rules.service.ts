@@ -5,8 +5,26 @@ import { SupabaseProvider } from '@/supabase/supabase.provider';
 @Injectable()
 export class DiscountRulesService {
   constructor(private readonly supabase: SupabaseProvider) {}
-  findAll() {
-    return this.supabase.from('discount_rules').select('*');
+  async findAll() {
+    const { data } = await this.supabase.from('discount_rules').select(`
+      id,
+      rule_type,
+      quantity,
+      discount_value,
+      product:fk_discount_rules_product_id (
+        id,
+        sku,
+        price,
+        name
+      ),
+      discount_product:fk_discount_rules_discount_product_id (
+        id,
+        sku,
+        price,
+        name
+      )
+    `);
+    return data;
   }
 
   async findOne(id: number) {

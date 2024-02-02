@@ -1,5 +1,9 @@
 import { SupabaseProvider } from '@/supabase/supabase.provider';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
   UserLoginDto,
@@ -7,6 +11,7 @@ import {
 } from '../application/rest/user.request';
 import { hashString } from '@/common/hash';
 import { RequestContext } from '@/common/request-context';
+import { awaitToError } from '@/common/await-to-error';
 
 @Injectable()
 export class UserService {
@@ -64,7 +69,7 @@ export class UserService {
       .single();
 
     if (error) {
-      throw new Error(error.message);
+      throw new NotFoundException();
     }
 
     if (showPassword) {
@@ -77,7 +82,12 @@ export class UserService {
 
   private async validateUser(username: string, password: string) {
     // Check if the user exists in Supabase or your user database
-    const user = await this.findUserByUsername(username, true);
+    const [err, user] = await awaitToError(
+      this.findUserByUsername(username, true),
+    );
+    if (err) {
+      return null;
+    }
 
     if (user && user.password === password) {
       const { ...result } = user;

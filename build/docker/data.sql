@@ -4,8 +4,7 @@ create table products (
   sku character varying null,
   name character varying null,
   price double precision null default '0' :: double precision,
-  primary key (id),
-  unique(sku)
+  primary key (id)
 );
 
 create table users (
