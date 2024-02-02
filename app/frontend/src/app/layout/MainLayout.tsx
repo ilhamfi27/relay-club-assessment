@@ -13,9 +13,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import MenuItem from '@mui/material/MenuItem';
-import Menu from '@mui/material/Menu';
+import LogoutIcon from '@mui/icons-material/Logout';
+import HomeIcon from '@mui/icons-material/Home';
 import { FC, ReactNode, useState } from 'react';
 import SidebarItem from '@/components/ListItem/SidebarItem';
 import Link from 'next/link';
@@ -113,35 +112,6 @@ const MainLayout: FC<MainLayoutProps> = ({ children }) => {
               Home
             </Typography>
           </Link>
-          <div className="absolute right-0">
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleMenu}
-              color="inherit"
-            >
-              <AccountCircle />
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorEl}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              open={Boolean(anchorEl)}
-              onClose={handleClose}
-            >
-              <MenuItem onClick={handleClose}>Logout</MenuItem>
-            </Menu>
-          </div>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -168,8 +138,15 @@ const MainLayout: FC<MainLayoutProps> = ({ children }) => {
         </DrawerHeader>
         <Divider />
         <List>
+          <Link href={'/'} onClick={handleDrawerClose}>
+            <SidebarItem text="Home" icon={<HomeIcon />} />
+          </Link>
           <Link href={'/products'} onClick={handleDrawerClose}>
             <SidebarItem text="Products" icon={<InventoryIcon />} />
+          </Link>
+          <Divider />
+          <Link href={'/'} onClick={handleDrawerClose}>
+            <SidebarItem text="Logout" icon={<LogoutIcon />} />
           </Link>
         </List>
       </Drawer>
