@@ -89,7 +89,15 @@ const DiscountRulesForm: FC<DiscountRulesFormProps> = ({
         autoComplete="product_id"
         autoFocus
         select
-        defaultValue={formValue?.product.id}
+        value={formValue && formValue.product.id}
+        onChange={(e) => {
+          setFormValue({
+            ...formValue,
+            product: products.find(
+              (product) => product.id === Number(e.target.value),
+            ),
+          } as DiscountRules);
+        }}
       >
         {products.map((product) => (
           <MenuItem
@@ -127,6 +135,7 @@ const DiscountRulesForm: FC<DiscountRulesFormProps> = ({
         name="rule_type"
         autoComplete="rule_type"
         select
+        value={formValue && formValue?.rule_type}
         onChange={(e) => {
           setFormValue({
             ...formValue,
@@ -151,6 +160,15 @@ const DiscountRulesForm: FC<DiscountRulesFormProps> = ({
           name="discount_product_id"
           autoComplete="discount_product_id"
           select
+          value={formValue && formValue?.discount_product?.id}
+          onChange={(e) => {
+            setFormValue({
+              ...formValue,
+              discount_product: products.find(
+                (product) => product.id === Number(e.target.value),
+              ),
+            } as DiscountRules);
+          }}
         >
           {products.map((product) => (
             <MenuItem key={product.id} value={product.id}>
