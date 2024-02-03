@@ -22,6 +22,8 @@ import SidebarItem from '@/components/ListItem/SidebarItem';
 import Link from 'next/link';
 import { AuthContext } from '@/context/Auth';
 import { useRouter } from 'next/navigation';
+import { USER_TOKEN_KEY } from '@/constants/auth';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 const drawerWidth = 240;
 
@@ -83,7 +85,7 @@ const MainLayout: FC<MainLayoutProps> = ({ children }) => {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const { token, setToken } = useContext(AuthContext);
+  const { token, setToken, isUserOwner } = useContext(AuthContext);
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -102,7 +104,7 @@ const MainLayout: FC<MainLayoutProps> = ({ children }) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('userToken');
+    localStorage.removeItem(USER_TOKEN_KEY);
     setOpen(false);
     setToken(null);
   };
@@ -124,7 +126,10 @@ const MainLayout: FC<MainLayoutProps> = ({ children }) => {
           >
             <MenuIcon />
           </IconButton>
-          <Link href={'/'} onClick={handleDrawerClose}>
+          <Link
+            href={isUserOwner() ? '/dashboard' : '/'}
+            onClick={handleDrawerClose}
+          >
             <Typography variant="h6" noWrap component="div">
               Home
             </Typography>
@@ -155,15 +160,23 @@ const MainLayout: FC<MainLayoutProps> = ({ children }) => {
         </DrawerHeader>
         <Divider />
         <List>
-          <Link href={'/'} onClick={handleDrawerClose}>
-            <SidebarItem text="Home" icon={<HomeIcon />} />
-          </Link>
-          <Link href={'/products'} onClick={handleDrawerClose}>
-            <SidebarItem text="Products" icon={<InventoryIcon />} />
-          </Link>
-          <Link href={'/discount-rules'} onClick={handleDrawerClose}>
-            <SidebarItem text="Discount Rules" icon={<DiscountIcon />} />
-          </Link>
+          {isUserOwner() ? (
+            <>
+              <Link href={'/dashboard'} onClick={handleDrawerClose}>
+                <SidebarItem text="Dashboard" icon={<HomeIcon />} />
+              </Link>
+              <Link href={'/products'} onClick={handleDrawerClose}>
+                <SidebarItem text="Products" icon={<InventoryIcon />} />
+              </Link>
+              <Link href={'/discount-rules'} onClick={handleDrawerClose}>
+                <SidebarItem text="Discount Rules" icon={<DiscountIcon />} />
+              </Link>
+            </>
+          ) : (
+            <Link href={'/cart'} onClick={handleDrawerClose}>
+              <SidebarItem text="Cart" icon={<ShoppingCartIcon />} />
+            </Link>
+          )}
           <Divider />
           <SidebarItem
             text="Logout"

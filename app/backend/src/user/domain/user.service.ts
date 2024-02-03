@@ -34,6 +34,7 @@ export class UserService {
         expiresIn: '1y',
         secret: 'supersecretdata',
       }),
+      user: validated,
     };
   }
 
@@ -64,7 +65,7 @@ export class UserService {
   private async findUserByUsername(username: string, showPassword = false) {
     const { data, error } = await this.supabase
       .from('users')
-      .select('id, username, password, name')
+      .select('id, username, password, name, role')
       .eq('username', username)
       .single();
 

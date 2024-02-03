@@ -1,3 +1,4 @@
+import { USER_TOKEN_KEY } from '@/constants/auth';
 import axios from 'axios';
 
 export const useRequest = () => {
@@ -6,7 +7,7 @@ export const useRequest = () => {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${
-        typeof window !== 'undefined' && localStorage.getItem('userToken')
+        typeof window !== 'undefined' && localStorage.getItem(USER_TOKEN_KEY)
       }`,
     },
   });

@@ -13,6 +13,7 @@ create table users (
   username character varying not null,
   password character varying not null,
   name character varying not null,
+  role character varying not null default 'buyer' :: character varying,
   primary key (id),
   unique(username)
 );
@@ -64,17 +65,25 @@ values
   ('vga', 'VGA adapter', 30.00);
 
 insert into
-  users (username, password, name)
+  users (username, password, name, role)
 values
   (
     'admin',
     '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',
-    'Admin'
+    'Admin',
+    'owner'
   ),
   (
     'ilham',
     'e467a85cdae98a0cb4edb5570aad4bd093dc2b652b6677a5949bd4ae36922bb4',
-    'Ilham'
+    'Ilham',
+    'owner'
+  ),
+  (
+    'buyer',
+    '6dbd0f28d0d97656768b7b4ed96255e67fd11740a44b1c4b575191b06e9e3a35',
+    'Buyer',
+    'buyer'
   );
 
 INSERT INTO

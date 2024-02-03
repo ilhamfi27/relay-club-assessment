@@ -18,6 +18,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useAuth } from '@/services/auth';
 import { useRouter } from 'next/navigation';
 import { AuthContext } from '@/context/Auth';
+import { USER_DATA_KEY, USER_TOKEN_KEY } from '@/constants/auth';
 
 function Copyright(props: any) {
   return (
@@ -42,14 +43,8 @@ const defaultTheme = createTheme();
 export default function SignIn() {
   const [errorMessage, setErrorMessage] = React.useState<string | null>();
   const { login } = useAuth();
-  const { token, setToken } = React.useContext(AuthContext);
+  const { setToken, setUser } = React.useContext(AuthContext);
   const router = useRouter();
-
-  React.useEffect(() => {
-    if (token) {
-      router.push('/');
-    }
-  }, []);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -59,10 +54,11 @@ export default function SignIn() {
       password: data.get('password') as string,
     })
       .then((res) => {
-        localStorage.setItem('userToken', res.data.idToken);
+        const u = res.data.user;
+        localStorage.setItem(USER_TOKEN_KEY, res.data.idToken);
+        localStorage.setItem(USER_DATA_KEY, JSON.stringify(u));
         setToken(res.data.idToken);
-
-        router.push('/');
+        setUser(u);
       })
       .catch((err) => {
         if (err.response) setErrorMessage(err.response.data.message);
