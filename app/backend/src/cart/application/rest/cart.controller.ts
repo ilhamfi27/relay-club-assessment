@@ -17,8 +17,8 @@ export class CartController {
   @Put('/products')
   @ApiBearerAuth()
   addToCart(@Body() addToCartDto: AddToCartDto) {
-    const { productId, quantity } = addToCartDto;
-    return this.cartService.addToCart({ productId, quantity });
+    const { product_id, quantity } = addToCartDto;
+    return this.cartService.addToCart({ product_id, quantity });
   }
 
   @Get('/checkout')

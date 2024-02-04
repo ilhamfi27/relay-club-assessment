@@ -54,7 +54,7 @@ export const AuthContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const ALLOWED_ANON_PATH = ['/login', '/register', '/shop'];
+  const ALLOWED_ANON_PATH = ['/', '/login', '/register', '/shop'];
 
   const isUserOwner = () => user?.role === UserRole.OWNER;
   const isUserBuyer = () => user?.role === UserRole.BUYER;
@@ -77,8 +77,6 @@ export const AuthContextProvider: FC<PropsWithChildren> = ({ children }) => {
     if (!user && !ALLOWED_ANON_PATH.includes(pathname)) {
       router.push('/login');
       return;
-    }
-    if (user) {
     }
     if (user && pathname.startsWith('/login')) {
       if (user.role === UserRole.OWNER) {

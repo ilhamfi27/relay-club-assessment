@@ -4,7 +4,7 @@ import { IsInt, Min } from 'class-validator';
 export class AddToCartDto {
   @IsInt()
   @ApiProperty()
-  productId: number;
+  product_id: number;
 
   @IsInt()
   @Min(1)

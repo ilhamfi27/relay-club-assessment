@@ -19,7 +19,6 @@ type DiscountRule = {
 };
 
 type Cart = {
-  product_id: number;
   quantity: number;
   product: Product;
 };
@@ -48,20 +47,16 @@ export class CartService {
     // Fetch the products associated with the cart
     const { data: products, error: productError } = await this.supabaseProvider
       .from('carts_products')
-      .select('product_id, quantity, product:products (sku, name, price)')
+      .select('quantity, product:products (id, sku, name, price)')
       .eq('cart_id', cart.id);
 
     if (productError) {
       throw new NotFoundException('Failed to fetch products for the cart');
     }
-
-    // Add the products to the cart response
-    cart.products = products || [];
-
-    return cart;
+    return products as unknown as Cart[];
   }
 
-  async addToCart({ productId, quantity }: AddToCartDto): Promise<any> {
+  async addToCart({ product_id, quantity }: AddToCartDto): Promise<any> {
     const { user } = RequestContext.getContext();
     let err = null,
       cart = null;
@@ -73,7 +68,7 @@ export class CartService {
     const { data: product, error: productError } = await this.supabaseProvider
       .from('products')
       .select('*')
-      .eq('id', productId)
+      .eq('id', product_id)
       .single();
 
     if (productError || !product) {
@@ -86,7 +81,7 @@ export class CartService {
       .upsert([
         {
           cart_id: cart.id,
-          product_id: productId,
+          product_id: product_id,
           quantity,
         },
       ]);
@@ -107,8 +102,7 @@ export class CartService {
       throw err;
     }
 
-    const products = cart.products;
-    const totalData = await this.calculateTotalPrice(products);
+    const totalData = await this.calculateTotalPrice(cart);
     return totalData;
   }
 

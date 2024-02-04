@@ -2,7 +2,8 @@ import { UserLogin, UserType } from '@/@types/user';
 import { useRequest } from './api.internal';
 
 export const useAuth = () => {
-  const { client } = useRequest();
+  const { client, loading } = useRequest();
+
   const login = ({ username, password }: UserLogin) => {
     return client.post('/login', { username, password });
   };
@@ -13,6 +14,7 @@ export const useAuth = () => {
     return client.get('/users/me');
   };
   return {
+    loading,
     getProfile,
     login,
     register,
