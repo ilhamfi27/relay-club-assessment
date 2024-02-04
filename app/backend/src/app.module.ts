@@ -16,6 +16,7 @@ import { JwtService } from '@nestjs/jwt';
 import { CartModule } from './cart/cart.module';
 import { DiscountRulesModule } from './discount-rules/discount-rules.module';
 import { UserQuery } from './user/infrastructure/db/user.query';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { UserQuery } from './user/infrastructure/db/user.query';
     CartModule,
     DiscountRulesModule,
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [UserService, UserQuery, JwtService],
 })
 export class AppModule implements NestModule {

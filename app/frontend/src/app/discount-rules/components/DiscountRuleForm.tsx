@@ -36,10 +36,10 @@ const DiscountRulesForm: FC<DiscountRulesFormProps> = ({
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const product_id = Number(formData.get('product_id'));
     const payload = {
       quantity: Number(formData.get('quantity')),
       rule_type: formData.get('rule_type') as RuleType,
+      product_id: Number(formData.get('product_id')),
       discount_product_id: formData.get('discount_product_id')
         ? Number(formData.get('discount_product_id'))
         : undefined,
@@ -47,7 +47,7 @@ const DiscountRulesForm: FC<DiscountRulesFormProps> = ({
     } as unknown as DiscountRules;
 
     if (data) {
-      update(product_id, data.id, payload)
+      update(data.id, payload)
         .then((res) => {
           onSubmitSuccess && onSubmitSuccess(res);
         })
@@ -57,7 +57,7 @@ const DiscountRulesForm: FC<DiscountRulesFormProps> = ({
     } else {
       console.log(Number(formData.get('discount_product_id')));
 
-      create(product_id, payload)
+      create(payload)
         .then((res) => {
           onSubmitSuccess && onSubmitSuccess(res);
         })
@@ -113,23 +113,6 @@ const DiscountRulesForm: FC<DiscountRulesFormProps> = ({
         margin="normal"
         required
         fullWidth
-        id="quantity"
-        label="Minimum Quantity"
-        name="quantity"
-        autoComplete="quantity"
-        type="number"
-        value={formValue?.quantity}
-        onChange={(e) => {
-          setFormValue({
-            ...formValue,
-            quantity: Number(e.target.value),
-          } as DiscountRules);
-        }}
-      />
-      <TextField
-        margin="normal"
-        required
-        fullWidth
         id="rule_type"
         label="Rule Type"
         name="rule_type"
@@ -149,6 +132,23 @@ const DiscountRulesForm: FC<DiscountRulesFormProps> = ({
           </MenuItem>
         ))}
       </TextField>
+      <TextField
+        margin="normal"
+        required
+        fullWidth
+        id="quantity"
+        label="Minimum Quantity"
+        name="quantity"
+        autoComplete="quantity"
+        type="number"
+        value={formValue?.quantity}
+        onChange={(e) => {
+          setFormValue({
+            ...formValue,
+            quantity: Number(e.target.value),
+          } as DiscountRules);
+        }}
+      />
 
       {formValue?.rule_type !== RuleType.BULK_PURCHASE_DISCOUNT && (
         <TextField

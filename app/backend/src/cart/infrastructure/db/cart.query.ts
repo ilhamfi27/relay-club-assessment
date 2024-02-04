@@ -50,4 +50,11 @@ export class CartQuery {
       throw new Error('Failed to add product to cart');
     }
   }
+
+  async removeAllCartProducts(cart_id: number) {
+    return this.supabaseProvider
+      .from('carts_products')
+      .delete()
+      .eq('cart_id', cart_id);
+  }
 }

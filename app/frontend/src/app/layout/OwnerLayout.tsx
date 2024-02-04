@@ -24,6 +24,8 @@ import { AuthContext } from '@/context/Auth';
 import { useRouter } from 'next/navigation';
 import { USER_DATA_KEY, USER_TOKEN_KEY } from '@/constants/auth';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import { AccountCircle } from '@mui/icons-material';
+import { Menu, MenuItem } from '@mui/material';
 
 const drawerWidth = 240;
 
@@ -78,8 +80,19 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 const OwnerLayout: FC<PropsWithChildren> = ({ children }) => {
   const theme = useTheme();
-  const [open, setOpen] = useState(false);
-  const { token, setToken, setUser, isUserOwner } = useContext(AuthContext);
+  const [open, setOpen] = useState(true);
+  const { token, setToken, setUser, user, isUserOwner } =
+    useContext(AuthContext);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const router = useRouter();
+
+  const handleMenu = (event: any) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -95,6 +108,8 @@ const OwnerLayout: FC<PropsWithChildren> = ({ children }) => {
     setOpen(false);
     setToken(null);
     setUser(null);
+    setAnchorEl(null);
+    router.push('/');
   };
 
   if (!token) {
@@ -104,24 +119,57 @@ const OwnerLayout: FC<PropsWithChildren> = ({ children }) => {
   return (
     <Box sx={{ display: 'flex' }}>
       <AppBar position="fixed" open={open}>
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{ mr: 2, ...(open && { display: 'none' }) }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Link
-            href={isUserOwner() ? '/dashboard' : '/'}
-            onClick={handleDrawerClose}
-          >
-            <Typography variant="h6" noWrap component="div">
-              Home
-            </Typography>
-          </Link>
+        <Toolbar className="justify-between">
+          <div className="flex items-center">
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerOpen}
+              edge="start"
+              sx={{ mr: 2, ...(open && { display: 'none' }) }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Link
+              href={isUserOwner() ? '/dashboard' : '/'}
+              onClick={handleDrawerClose}
+            >
+              <Typography variant="h6" noWrap component="div">
+                Home
+              </Typography>
+            </Link>
+          </div>
+          {token && (
+            <div className="flex gap-4">
+              <IconButton
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleMenu}
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorEl}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+              >
+                <MenuItem style={{ cursor: 'default' }}>{user?.name}</MenuItem>
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+              </Menu>
+            </div>
+          )}
         </Toolbar>
       </AppBar>
       <Drawer
@@ -150,13 +198,13 @@ const OwnerLayout: FC<PropsWithChildren> = ({ children }) => {
         <List>
           {isUserOwner() ? (
             <>
-              <Link href={'/dashboard'} onClick={handleDrawerClose}>
+              <Link href={'/dashboard'}>
                 <SidebarItem text="Dashboard" icon={<HomeIcon />} />
               </Link>
-              <Link href={'/products'} onClick={handleDrawerClose}>
+              <Link href={'/products'}>
                 <SidebarItem text="Products" icon={<InventoryIcon />} />
               </Link>
-              <Link href={'/discount-rules'} onClick={handleDrawerClose}>
+              <Link href={'/discount-rules'}>
                 <SidebarItem text="Discount Rules" icon={<DiscountIcon />} />
               </Link>
             </>
@@ -165,12 +213,6 @@ const OwnerLayout: FC<PropsWithChildren> = ({ children }) => {
               <SidebarItem text="Cart" icon={<ShoppingCartIcon />} />
             </Link>
           )}
-          <Divider />
-          <SidebarItem
-            text="Logout"
-            icon={<LogoutIcon />}
-            onClick={handleLogout}
-          />
         </List>
       </Drawer>
       <Main open={open}>

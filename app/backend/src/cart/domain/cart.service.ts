@@ -102,6 +102,10 @@ export class CartService {
       return acc + c.price * c.quantity;
     }, 0);
 
-    return { _cart: Object.values(_cart), total };
+    const { user } = RequestContext.getContext();
+    const userCart = await this.cartQuery.getCartByUser(user.id);
+    await awaitToError(this.cartQuery.removeAllCartProducts(userCart.id));
+
+    return { cart: Object.values(_cart), total };
   }
 }

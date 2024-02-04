@@ -1,7 +1,7 @@
 import { IsEnum, IsNumber } from 'class-validator';
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 
-enum RuleType {
+export enum RuleType {
   BUY_X_GET_Y_FREE = 'BUY_X_GET_Y_FREE',
   BULK_PURCHASE_DISCOUNT = 'BULK_PURCHASE_DISCOUNT',
   FREE_PRODUCT = 'FREE_PRODUCT',
@@ -35,9 +35,5 @@ export class DiscountRuleDto {
   readonly discount_product_id?: number;
 }
 
-export class CreateDiscountRuleDto extends OmitType(DiscountRuleDto, [
-  'product_id',
-]) {}
-export class UpdateDiscountRuleDto extends OmitType(DiscountRuleDto, [
-  'product_id',
-]) {}
+export class CreateDiscountRuleDto extends OmitType(DiscountRuleDto, []) {}
+export class UpdateDiscountRuleDto extends OmitType(DiscountRuleDto, []) {}

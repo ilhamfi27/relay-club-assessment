@@ -1,0 +1,4 @@
+{
+  "include": ["src/**/*.spec.tsx"],
+  "exclude": ["node_modules"]
+}

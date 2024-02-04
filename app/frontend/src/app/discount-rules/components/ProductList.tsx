@@ -4,7 +4,7 @@ import {
   RuleType,
   useDiscountRules,
 } from '@/services/discount-rules';
-import { Edit, Delete } from '@mui/icons-material';
+import { Edit, Delete, Add } from '@mui/icons-material';
 import { IconButton, Box, Button, TextField } from '@mui/material';
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import { useEffect, useState } from 'react';
@@ -89,14 +89,17 @@ const DiscountRuleList = () => {
 
   return (
     <>
-      <Button
-        onClick={() => {
-          setModalOpen(true);
-          setDiscountRule(null);
-        }}
-      >
-        Add Discount Rule
-      </Button>
+      <div className="w-full flex gap-4 justify-end mb-4">
+        <Button
+          variant="contained"
+          onClick={() => {
+            setModalOpen(true);
+            setDiscountRule(null);
+          }}
+        >
+          <Add /> Add Discount Rule
+        </Button>
+      </div>
       <Box
         sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 2 }}
       >

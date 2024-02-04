@@ -1,5 +1,5 @@
 {
-  "name": "project-name",
+  "name": "backend",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -19,7 +19,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "compile": "cross-env NODE_ENV=production PKG_CACHE_PATH=.pkg PKG_PLATFORM=${PKG_PLATFORM} ts-node misc/compiler/pkg.ts",
-    "pkg": "npm run build && npm run compile"
+    "pkg": "npm run build && npm run compile",
+    "build:docker": "docker build -t relay-assessment-backend ."
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -49,6 +50,7 @@
     "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
+    "cross-env": "^7.0.3",
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
@@ -83,5 +85,20 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "bin": {
+    "app": "dist/main.js"
+  },
+  "pkg": {
+    "outputPath": ".bin",
+    "scripts": [
+      "node_modules/axios/dist/node/axios.cjs",
+      "node_modules/swagger-ui-dist/**/*.js",
+      "node_modules/@nestjs/swagger/**/*.js"
+    ],
+    "assets": [
+      "node_modules/@nestjs/swagger/**/*",
+      "node_modules/swagger-ui-dist/**/*"
+    ]
   }
 }

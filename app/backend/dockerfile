@@ -1,0 +1,20 @@
+FROM node:18.15.0-alpine as base
+RUN apk update &&\
+    apk add --no-cache build-base git python3 bash
+
+FROM base as builder
+WORKDIR /src/app
+COPY . .
+RUN npm install -g typescript
+RUN yarn install
+ENV NODE_ENV=production
+RUN PKG_PLATFORM=alpine yarn pkg
+
+FROM alpine as final
+RUN \
+    apk update &&\
+    apk add --no-cache bash
+
+COPY --from=builder /src/app/.bin/backend /usr/local/bin/backend
+
+ENTRYPOINT [ "backend" ]

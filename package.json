@@ -9,20 +9,26 @@
     "private": true,
     "license": "UNLICENSED",
     "workspaces": [
-        "backend/backend",
-        "backend/client"
+        "app/*"
     ],
     "scripts": {
         "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
         "start:backend:dev": "cd app/backend && yarn start:debug",
         "start:frontend:dev": "cd app/frontend && yarn dev",
-        "start:dev:all": "concurrently \"yarn start:backend:dev\" \"yarn start:frontend:dev\"",
+        "start:all:dev": "concurrently \"yarn start:backend:dev\" \"yarn start:frontend:dev\"",
         "start:backend:prod": "cd app/backend && yarn start:prod",
-        "start:frontend:prod": "cd app/frontend && yarn build && yarn start",
+        "start:frontend:prod": "cd app/frontend && yarn start",
+        "start:all:prod": "concurrently \"yarn start:backend:prod\" \"yarn start:frontend:prod\"",
         "test:backend": "cd app/backend && yarn test",
         "test:frontend": "cd app/frontend && yarn test",
-        "docker-compose": "docker-compose -f build/docker/docker-compose.yml",
-        "docker-compose:dev": "docker-compose -f build/docker/docker-compose.yml -f build/docker/docker-compose.dev.yml"
+        "build:backend": "cd app/backend && yarn build",
+        "build:frontend": "cd app/frontend && yarn build",
+        "build:all": "concurrently \"yarn build:backend\" \"yarn build:frontend\"",
+        "docker-compose": "docker compose -f build/docker/docker-compose.yml",
+        "docker-compose:dev": "yarn docker-compose -f build/docker/docker-compose.yml -f build/docker/docker-compose.dev.yml",
+        "docker-compose:prod": "yarn docker-compose -f build/docker/docker-compose.yml -f build/docker/docker-compose.prod.yml",
+        "build:backend:docker": "cd app/backend && yarn build:docker",
+        "build:frontend:docker": "cd app/frontend && yarn build:docker"
     },
     "dependencies": {
         "concurrently": "^8.2.2",

@@ -1,0 +1,36 @@
+FROM node:18.18.0-alpine as base
+
+RUN apk update && \
+    apk add --no-cache build-base python3 bash g++ curl
+
+
+FROM node:18.18.0-alpine as builder
+WORKDIR /src/app
+
+RUN apk update && \
+    apk add --no-cache build-base python3 bash g++
+    
+ENV NODE_ENV=production
+
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
+
+COPY . .
+RUN yarn build
+
+FROM node:18.18.0-alpine as final
+WORKDIR /src/app
+
+RUN apk update && \
+    apk add --no-cache bash
+
+COPY --from=builder /src/app/package.json .
+COPY --from=builder /src/app/yarn.lock .
+COPY --from=builder /src/app/next.config.js ./
+COPY --from=builder /src/app/public ./public
+COPY --from=builder /src/app/node_modules ./node_modules
+COPY --from=builder /src/app/dist ./dist
+
+EXPOSE 3000
+
+CMD ["yarn", "start"]

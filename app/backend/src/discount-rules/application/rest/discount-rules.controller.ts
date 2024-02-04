@@ -19,15 +19,11 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 export class DiscountRulesController {
   constructor(private readonly discountRulesService: DiscountRulesService) {}
 
-  @Post('/products/:product_id/discount-rules')
+  @Post('/discount-rules')
   @ApiBearerAuth()
-  create(
-    @Param('product_id') product_id: string,
-    @Body() createDiscountRuleDto: CreateDiscountRuleDto,
-  ) {
+  create(@Body() createDiscountRuleDto: CreateDiscountRuleDto) {
     return this.discountRulesService.create({
       ...createDiscountRuleDto,
-      product_id: +product_id,
     });
   }
 
@@ -41,16 +37,14 @@ export class DiscountRulesController {
     return this.discountRulesService.findOne(+id);
   }
 
-  @Put('/products/:product_id/discount-rules/:id')
+  @Put('/discount-rules/:id')
   @ApiBearerAuth()
   update(
-    @Param('product_id') product_id: string,
     @Param('id') id: string,
     @Body() updateDiscountRuleDto: UpdateDiscountRuleDto,
   ) {
     return this.discountRulesService.update(+id, {
       ...updateDiscountRuleDto,
-      product_id: +product_id,
     });
   }
 

@@ -29,15 +29,14 @@ export const useDiscountRules = () => {
       `/discount-rules?page=${page}&size${size}`,
     );
   };
-  const create = (productId: number, data: Omit<DiscountRules, 'id'>) => {
-    return client.post(`/products/${productId}/discount-rules`, data);
+  const create = (data: Omit<DiscountRules, 'id'>) => {
+    return client.post(`/discount-rules`, data);
   };
   const update = (
-    productId: number,
     id: number,
     data: Omit<DiscountRules, 'id'>,
   ) => {
-    return client.put(`/products/${productId}/discount-rules/${id}`, data);
+    return client.put(`/discount-rules/${id}`, data);
   };
   const remove = (id: number) => {
     return client.delete(`/discount-rules/${id}`);

@@ -5,6 +5,7 @@ import { RequestContext } from '@/common/request-context';
 import { CartQuery } from '../infrastructure/db/cart.query';
 import { DiscountRuleQuery } from '@/discount-rules/infrastructure/db/discount-rule.query';
 import { UserRole } from '@/user/model/entity/user.entity';
+import { RuleType } from '@/discount-rules/application/rest/discount-rules.request';
 
 jest.mock('../infrastructure/db/cart.query');
 
@@ -195,7 +196,7 @@ describe('src/cart/domain/cart.service.spec.ts', () => {
 
       const discountRules = [
         {
-          rule_type: 'BUY_X_GET_Y_FREE',
+          rule_type: RuleType.BUY_X_GET_Y_FREE,
           quantity: 2,
           discount_value: 1,
           discount_product: {
@@ -207,7 +208,7 @@ describe('src/cart/domain/cart.service.spec.ts', () => {
           product: null,
         },
         {
-          rule_type: 'BULK_PURCHASE_DISCOUNT',
+          rule_type: RuleType.BULK_PURCHASE_DISCOUNT,
           quantity: 3,
           discount_value: 40,
           discount_product: null,
@@ -219,7 +220,7 @@ describe('src/cart/domain/cart.service.spec.ts', () => {
           },
         },
         {
-          rule_type: 'FREE_PRODUCT',
+          rule_type: RuleType.FREE_PRODUCT,
           quantity: null,
           discount_value: null,
           discount_product: {
@@ -258,13 +259,14 @@ describe('src/cart/domain/cart.service.spec.ts', () => {
 
       jest.spyOn(service, 'getCart').mockResolvedValue(cart);
       jest.spyOn(discountRuleQuery, 'findAll').mockResolvedValue(discountRules);
+      jest.spyOn(cartQuery, 'getCartByUser').mockResolvedValue(cart);
 
       // Act
       const result = await service.checkout();
 
       // Assert
       expect(service.getCart).toHaveBeenCalled();
-      expect(result._cart).toEqual(expectedCart);
+      expect(result.cart).toEqual(expectedCart);
       expect(result.total).toEqual(expectedTotal);
     });
   });

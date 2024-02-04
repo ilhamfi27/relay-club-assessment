@@ -7,8 +7,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('Sentiment Analysis API Documentation')
-    .setDescription('Sentiment Analysis API documentation lies here')
+    .setTitle('Relay Club Assessment API Documentation')
+    .setDescription('Relay Club Assessment API documentation lies here')
     .setVersion('1.0.0')
     .setContact('Ilham Fadhilah', '', 'r.ilhamfadhilah@gmail.com')
     .addBearerAuth()

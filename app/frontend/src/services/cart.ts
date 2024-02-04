@@ -89,6 +89,7 @@ export const useCart = () => {
     return client.put(`/carts/products`, localCart);
   };
   const checkout = () => {
+    localStorage.removeItem(CART_KEY);
     return client.get<CheckoutItems>(`/carts/checkout`);
   };
   return { add, findAll, checkout };

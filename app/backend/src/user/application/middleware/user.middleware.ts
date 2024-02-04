@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 
-interface RequestAddition {
+export interface RequestAddition {
   user?: UserEntity;
 }
 
@@ -20,7 +20,7 @@ export class AuthMiddleware implements NestMiddleware {
       throw new UnauthorizedException(`Token Required`);
     }
     try {
-      const authToken = req.header('authorization').split('Bearer ')[1];
+      const authToken = req.headers['authorization'].split('Bearer ')[1];
       const user = await this.authService.verifyToken(authToken);
       RequestContext.setContext({
         user,

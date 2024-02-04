@@ -1,6 +1,6 @@
 import SimpleDialog from '@/components/Dialog/SimpleDialog';
 import { Products, useProduct } from '@/services/products';
-import { Edit, Delete } from '@mui/icons-material';
+import { Edit, Delete, Add } from '@mui/icons-material';
 import { IconButton, Box, Button, TextField } from '@mui/material';
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import { useEffect, useState } from 'react';
@@ -76,14 +76,17 @@ const ProductList = () => {
 
   return (
     <>
-      <Button
-        onClick={() => {
-          setModalOpen(true);
-          setProduct(null);
-        }}
-      >
-        Add Product
-      </Button>
+      <div className="w-full flex gap-4 justify-end mb-4">
+        <Button
+          variant="contained"
+          onClick={() => {
+            setModalOpen(true);
+            setProduct(null);
+          }}
+        >
+          <Add />Add Product
+        </Button>
+      </div>
       <Box
         sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 2 }}
       >

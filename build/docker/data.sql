@@ -57,12 +57,12 @@ alter table
 
 -- seed product
 insert into
-  products (sku, name, price)
+  products (id, sku, name, price)
 values
-  ('ipd', 'Super iPad', 549.99),
-  ('mbp', 'MacBook Pro', 1399.99),
-  ('atv', 'Apple TV', 109.50),
-  ('vga', 'VGA adapter', 30.00);
+  (1, 'ipd', 'Super iPad', 549.99),
+  (2, 'mbp', 'MacBook Pro', 1399.99),
+  (3, 'atv', 'Apple TV', 109.50),
+  (4, 'vga', 'VGA adapter', 30.00);
 
 insert into
   users (username, password, name, role)
@@ -95,6 +95,6 @@ INSERT INTO
     discount_product_id
   )
 VALUES
-  (1, 'BUY_X_GET_Y_FREE', 3, 1, 1),
-  (2, 'BULK_PURCHASE_DISCOUNT', 5, 499.99, NULL),
-  (3, 'FREE_PRODUCT', 1, NULL, 4);
+  (3, 'BUY_X_GET_Y_FREE', 3, 1, 3),
+  (1, 'BULK_PURCHASE_DISCOUNT', 5, 499.99, NULL),
+  (2, 'FREE_PRODUCT', 1, NULL, 4);
