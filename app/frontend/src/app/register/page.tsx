@@ -6,47 +6,36 @@ import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import Alert from '@mui/material/Alert';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useAuth } from '@/services/auth';
 import { useRouter } from 'next/navigation';
 import { AuthContext } from '@/context/Auth';
-import { USER_DATA_KEY, USER_TOKEN_KEY } from '@/constants/auth';
 import { UserRole } from '@/@types/user';
+import { HowToReg } from '@mui/icons-material';
 
 const defaultTheme = createTheme();
 
 export default function SignIn() {
   const [errorMessage, setErrorMessage] = React.useState<string | null>();
-  const { login } = useAuth();
-  const { setToken, setUser } = React.useContext(AuthContext);
+  const { register } = useAuth();
   const router = useRouter();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    login({
+    register({
       username: data.get('username') as string,
       password: data.get('password') as string,
+      name: data.get('name') as string,
+      role: UserRole.BUYER,
     })
       .then((res) => {
-        const u = res.data.user;
-        localStorage.setItem(USER_TOKEN_KEY, res.data.idToken);
-        localStorage.setItem(USER_DATA_KEY, JSON.stringify(u));
-        setToken(res.data.idToken);
-        setUser(u);
-        if (u.role === UserRole.BUYER) {
-          router.push('/');
-        } else if (u.role === UserRole.OWNER) {
-          router.push('/dashboard');
-        }
+        router.push('/login');
       })
       .catch((err) => {
         if (err.response) setErrorMessage(err.response.data.message);
@@ -67,10 +56,10 @@ export default function SignIn() {
           }}
         >
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
+            <HowToReg />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in
+            Sign Up
           </Typography>
           <Box
             component="form"
@@ -78,6 +67,16 @@ export default function SignIn() {
             noValidate
             sx={{ mt: 1 }}
           >
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="name"
+              label="Name"
+              name="name"
+              autoComplete="name"
+              autoFocus
+            />
             <TextField
               margin="normal"
               required
@@ -104,13 +103,13 @@ export default function SignIn() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign In
+              Sign Up
             </Button>
             {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
             <Grid container>
               <Grid item>
-                <Link href="/register" variant="body2">
-                  {"Don't have an account? Sign Up"}
+                <Link href="/login" variant="body2">
+                  {'Already have an account? Sign In'}
                 </Link>
               </Grid>
             </Grid>

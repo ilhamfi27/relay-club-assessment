@@ -13,6 +13,7 @@ import { AuthContext } from '@/context/Auth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { USER_DATA_KEY, USER_TOKEN_KEY } from '@/constants/auth';
+import { CART_KEY } from '@/constants/cart';
 
 const useStyles = makeStyles((theme: any) => ({
   root: {
@@ -30,7 +31,7 @@ const BuyerLayout: FC<PropsWithChildren> = ({ children }) => {
   const classes = useStyles();
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState(null);
-  const { token, setToken, setUser, isUserOwner } = useContext(AuthContext);
+  const { token, setToken, setUser, user } = useContext(AuthContext);
 
   const handleMenu = (event: any) => {
     setAnchorEl(event.currentTarget);
@@ -43,6 +44,8 @@ const BuyerLayout: FC<PropsWithChildren> = ({ children }) => {
   const handleLogout = () => {
     localStorage.removeItem(USER_TOKEN_KEY);
     localStorage.removeItem(USER_DATA_KEY);
+    localStorage.removeItem(CART_KEY);
+
     setToken(null);
     setUser(null);
     setAnchorEl(null);
@@ -52,12 +55,12 @@ const BuyerLayout: FC<PropsWithChildren> = ({ children }) => {
   return (
     <div className={classes.root}>
       <AppBar position="static">
-        <Toolbar>
+        <Toolbar className="justify-between">
           <Link href={'/'} className={classes.title}>
             <Typography variant="h6">Relay Club Computer Store</Typography>
           </Link>
           {token ? (
-            <>
+            <div className="flex gap-4">
               <IconButton
                 edge="start"
                 className={classes.cartIcon}
@@ -97,13 +100,19 @@ const BuyerLayout: FC<PropsWithChildren> = ({ children }) => {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
               >
+                <MenuItem style={{ cursor: 'default' }}>{user?.name}</MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>
-            </>
+            </div>
           ) : (
-            <Link href={'/login'}>
-              <Typography>Login</Typography>
-            </Link>
+            <div className="flex gap-4">
+              <Link href={'/login'}>
+                <Typography>Login</Typography>
+              </Link>
+              <Link href={'/register'}>
+                <Typography>Register</Typography>
+              </Link>
+            </div>
           )}
         </Toolbar>
       </AppBar>
