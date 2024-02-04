@@ -2,6 +2,7 @@ import {
   CreateProductDto,
   UpdateProductDto,
 } from '@/product/application/rest/product.request';
+import { Product } from '@/product/model/entities/product.entity';
 import { SupabaseProvider } from '@/supabase/supabase.provider';
 import { Injectable, NotFoundException } from '@nestjs/common';
 
@@ -9,8 +10,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 export class ProductQuery {
   constructor(private readonly supabaseProvider: SupabaseProvider) {}
 
-  async create(createProductDto: CreateProductDto) {
-    const { data, error } = await this.supabaseProvider
+  async create(createProductDto: CreateProductDto): Promise<Product> {
+    const { error } = await this.supabaseProvider
       .from('products')
       .insert([createProductDto]);
 
@@ -18,7 +19,9 @@ export class ProductQuery {
       throw new Error(error.message);
     }
 
-    return data;
+    console.log(createProductDto);
+
+    return createProductDto as Product;
   }
 
   async findAll() {

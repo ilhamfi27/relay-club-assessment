@@ -17,20 +17,28 @@ export class UserService {
   ) {}
 
   async login(user: UserLoginDto) {
-    const validated = await this.validateUser(
-      user.username,
-      hashString(user.password),
+    let validated = false;
+
+    const [, userDb] = await awaitToError(
+      this.userQuery.findUserByUsername(user.username, true),
     );
+
+    if (userDb && userDb.password === hashString(user.password)) {
+      validated = true;
+    }
+
     if (!validated) {
       throw new UnauthorizedException();
     }
+    userDb.password = undefined;
+
     const payload = { username: user.username, sub: user.username };
     return {
       idToken: this.jwtService.sign(payload, {
         expiresIn: '1y',
         secret: 'supersecretdata',
       }),
-      user: validated,
+      user: userDb,
     };
   }
 
@@ -50,22 +58,5 @@ export class UserService {
       throw new UnauthorizedException();
     }
     return this.userQuery.findUserByUsername(decoded.username);
-  }
-
-  private async validateUser(username: string, password: string) {
-    // Check if the user exists in Supabase or your user database
-    const [err, user] = await awaitToError(
-      this.userQuery.findUserByUsername(username, true),
-    );
-    if (err) {
-      return null;
-    }
-
-    if (user && user.password === password) {
-      const { ...result } = user;
-      return result;
-    }
-
-    return null;
   }
 }

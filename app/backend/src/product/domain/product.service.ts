@@ -4,15 +4,20 @@ import {
   UpdateProductDto,
 } from '../application/rest/product.request';
 import { ProductQuery } from '../infrastructure/db/product.query';
+import { awaitToError } from '@/common/await-to-error';
 
 @Injectable()
 export class ProductService {
   constructor(private readonly productQuery: ProductQuery) {}
   async create(createProductDto: CreateProductDto) {
-    return this.productQuery.create(createProductDto);
+    const [, data] = await awaitToError(
+      this.productQuery.create(createProductDto),
+    );
+    return data;
   }
   async findAll() {
-    return this.productQuery.findAll();
+    const [, data] = await awaitToError(this.productQuery.findAll());
+    return data;
   }
   async findOne(id: number) {
     return this.productQuery.getProductById(id);

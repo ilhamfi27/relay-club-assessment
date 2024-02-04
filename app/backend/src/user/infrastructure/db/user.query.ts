@@ -1,5 +1,6 @@
 import { SupabaseProvider } from '@/supabase/supabase.provider';
 import { UserRegisterDto } from '@/user/application/rest/user.request';
+import { UserEntity } from '@/user/model/entity/user.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()
@@ -24,7 +25,7 @@ export class UserQuery {
     return data;
   }
 
-  async createUser(userData: UserRegisterDto) {
+  async createUser(userData: UserRegisterDto): Promise<UserEntity> {
     const { data, error } = await this.supabaseProvider
       .from('users')
       .insert([{ ...userData }]);

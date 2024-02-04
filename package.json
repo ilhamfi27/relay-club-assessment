@@ -17,6 +17,10 @@
         "start:backend:dev": "cd app/backend && yarn start:debug",
         "start:frontend:dev": "cd app/frontend && yarn dev",
         "start:dev:all": "concurrently \"yarn start:backend:dev\" \"yarn start:frontend:dev\"",
+        "start:backend:prod": "cd app/backend && yarn start:prod",
+        "start:frontend:prod": "cd app/frontend && yarn build && yarn start",
+        "test:backend": "cd app/backend && yarn test",
+        "test:frontend": "cd app/frontend && yarn test",
         "docker-compose": "docker-compose -f build/docker/docker-compose.yml",
         "docker-compose:dev": "docker-compose -f build/docker/docker-compose.yml -f build/docker/docker-compose.dev.yml"
     },

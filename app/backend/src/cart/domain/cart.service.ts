@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import { AddToCartDto } from '../application/rest/cart.request';
 import { awaitToError } from '@/common/await-to-error';
 import { CartQuery } from '../infrastructure/db/cart.query';
-import { Cart } from '../model/entities/cart.entity';
 import { DiscountRuleQuery } from '@/discount-rules/infrastructure/db/discount-rule.query';
 
 @Injectable()
@@ -50,16 +49,11 @@ export class CartService {
       throw err;
     }
 
-    const totalData = await this.calculateTotalPrice(cart);
-    return totalData;
-  }
-
-  private async calculateTotalPrice(productCart: Cart[]) {
     const discountRules = await this.discountRuleQuery.findAll();
-    const cart: Record<number, string> = {};
+    const _cart: Record<number, string> = {};
 
-    productCart.forEach((c) => {
-      cart[c.product.sku] = { ...c.product, quantity: c.quantity };
+    cart.forEach((c) => {
+      _cart[c.product.sku] = { ...c.product, quantity: c.quantity };
     });
 
     discountRules.forEach((rule) => {
@@ -70,30 +64,30 @@ export class CartService {
         case 'BUY_X_GET_Y_FREE':
           if (
             discount_product &&
-            cart[discount_product.sku] &&
-            cart[discount_product.sku].quantity >= quantity
+            _cart[discount_product.sku] &&
+            _cart[discount_product.sku].quantity >= quantity
           ) {
-            cart[discount_product.sku].quantity -= discount_value;
+            _cart[discount_product.sku].quantity -= discount_value;
           }
           break;
 
         case 'BULK_PURCHASE_DISCOUNT':
           if (
             product &&
-            cart[product.sku] &&
-            cart[product.sku].quantity >= quantity
+            _cart[product.sku] &&
+            _cart[product.sku].quantity >= quantity
           ) {
-            cart[product.sku].price = discount_value;
+            _cart[product.sku].price = discount_value;
           }
           break;
 
         case 'FREE_PRODUCT':
-          if (product && cart[product.sku]) {
-            cart[discount_product.sku] = {};
-            cart[discount_product.sku] = {
+          if (product && _cart[product.sku]) {
+            _cart[discount_product.sku] = {};
+            _cart[discount_product.sku] = {
               ...discount_product,
               price: 0,
-              quantity: cart[product.sku].quantity,
+              quantity: _cart[product.sku].quantity,
             };
           }
           break;
@@ -103,11 +97,11 @@ export class CartService {
       }
     });
 
-    const total = Object.keys(cart).reduce((acc, key) => {
-      const c = cart[key];
+    const total = Object.keys(_cart).reduce((acc, key) => {
+      const c = _cart[key];
       return acc + c.price * c.quantity;
     }, 0);
 
-    return { cart: Object.values(cart), total };
+    return { _cart: Object.values(_cart), total };
   }
 }
