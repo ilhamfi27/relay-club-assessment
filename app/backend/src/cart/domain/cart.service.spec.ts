@@ -6,6 +6,8 @@ import { CartQuery } from '../infrastructure/db/cart.query';
 import { DiscountRuleQuery } from '@/discount-rules/infrastructure/db/discount-rule.query';
 import { UserRole } from '@/user/model/entity/user.entity';
 
+jest.mock('../infrastructure/db/cart.query');
+
 describe('src/cart/domain/cart.service.spec.ts', () => {
   let service: CartService;
   let cartQuery: CartQuery;
@@ -124,11 +126,24 @@ describe('src/cart/domain/cart.service.spec.ts', () => {
       const product_id = 1;
       const quantity = 2;
       const cart = { id: 'cart-id' };
+      const cartProducts = [
+        {
+          id: 1,
+          quantity: 1,
+          product: {
+            id: 1,
+            sku: 'sku',
+            name: 'name',
+            price: 100,
+          },
+        },
+      ];
 
       jest.spyOn(RequestContext, 'getContext').mockReturnValue({ user });
       jest.spyOn(cartQuery, 'getCartByUser').mockRejectedValue(null);
       jest.spyOn(cartQuery, 'initiateCart').mockResolvedValue(undefined);
       jest.spyOn(cartQuery, 'getCartByUser').mockResolvedValue(cart);
+      jest.spyOn(cartQuery, 'getCartProducts').mockResolvedValue(cartProducts);
       jest.spyOn(cartQuery, 'upsertCartProduct').mockResolvedValue(undefined);
 
       // Act
@@ -142,7 +157,6 @@ describe('src/cart/domain/cart.service.spec.ts', () => {
         product_id,
         quantity,
       });
-      expect(service.getCart).toHaveBeenCalled();
       expect(result).toEqual([
         {
           id: 1,

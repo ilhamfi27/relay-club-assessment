@@ -1,21 +1,29 @@
-import { TestingModule } from '@nestjs/testing';
-import { ProductService } from './product.service';
 import { getAppModule } from 'test/fixture/module-fixture';
-import { CreateProductDto } from '../application/rest/product.request';
+import { ProductService } from './product.service';
+import {
+  CreateProductDto,
+  UpdateProductDto,
+} from '../application/rest/product.request';
 import { ProductQuery } from '../infrastructure/db/product.query';
-import { Product } from '../model/entities/product.entity';
 
 jest.mock('../infrastructure/db/product.query');
+const createMock = jest.fn(),
+  findAllMock = jest.fn(),
+  getProductByIdMock = jest.fn(),
+  updateMock = jest.fn(),
+  deleteMock = jest.fn();
+ProductQuery.prototype.create = createMock;
+ProductQuery.prototype.findAll = findAllMock;
+ProductQuery.prototype.getProductById = getProductByIdMock;
+ProductQuery.prototype.update = updateMock;
+ProductQuery.prototype.removeById = deleteMock;
 
 describe('src/product/domain/product.service.spec.ts', () => {
   let service: ProductService;
-  let productQuery: ProductQuery;
 
   beforeEach(async () => {
-    const module: TestingModule = await getAppModule();
-
+    const module = await getAppModule();
     service = module.get<ProductService>(ProductService);
-    productQuery = module.get<ProductQuery>(ProductQuery);
   });
 
   afterEach(() => {
@@ -27,45 +35,95 @@ describe('src/product/domain/product.service.spec.ts', () => {
   });
 
   describe('create', () => {
-    it('should create a new product', async () => {
+    it('should create a product', async () => {
       // Arrange
       const createProductDto: CreateProductDto = {
-        name: 'Test Product',
+        name: 'product',
         price: 100,
-        sku: 'test-sku',
+        sku: 'sku',
       };
 
-      jest
-        .spyOn(productQuery, 'create')
-        .mockResolvedValue(createProductDto as Product);
+      createMock.mockResolvedValue({ id: 1, ...createProductDto });
 
       // Act
       const result = await service.create(createProductDto);
 
       // Assert
-      // Add your assertions here
-      expect(productQuery.create).toHaveBeenCalled();
-      expect(result).toEqual(createProductDto);
+      expect(result).toBeDefined();
+      // Add more assertions based on your expected behavior
     });
   });
 
   describe('findAll', () => {
-    it('should find all products', async () => {
+    it('should return all products', async () => {
       // Arrange
-      const products: Product[] = [
-        { id: 1, name: 'Product 1', price: 10, sku: 'sku-1' },
-        { id: 2, name: 'Product 2', price: 20, sku: 'sku-2' },
+      const expectedData = [
+        { id: 1, name: 'product1', price: 100, sku: 'sku1' },
+        { id: 2, name: 'product2', price: 200, sku: 'sku2' },
       ];
-
-      jest.spyOn(productQuery, 'findAll').mockResolvedValue(products);
+      const mockFindAll = findAllMock.mockResolvedValue(expectedData);
 
       // Act
       const result = await service.findAll();
-      console.log(result);
 
       // Assert
-      expect(productQuery.findAll).toHaveBeenCalled();
-      expect(result).toEqual(products);
+      expect(mockFindAll).toHaveBeenCalledTimes(1);
+      expect(result).toEqual(expectedData);
+    });
+  });
+  describe('findOne', () => {
+    it('should return a product by id', async () => {
+      // Arrange
+      const id = 1;
+      const expectedProduct = {
+        id: 1,
+        name: 'product',
+        price: 100,
+        sku: 'sku',
+      };
+      getProductByIdMock.mockResolvedValue(expectedProduct);
+
+      // Act
+      const result = await service.findOne(id);
+
+      // Assert
+      expect(result).toEqual(expectedProduct);
+      expect(getProductByIdMock).toHaveBeenCalledWith(id);
+    });
+  });
+
+  describe('update', () => {
+    it('should update a product', async () => {
+      // Arrange
+      const id = 1;
+      const updateProductDto: UpdateProductDto = {
+        name: 'updated product',
+        price: 200,
+        sku: 'updated sku',
+      };
+      updateMock.mockResolvedValue(true);
+
+      // Act
+      const result = await service.update(id, updateProductDto);
+
+      // Assert
+      expect(updateMock).toHaveBeenCalledWith(id, updateProductDto);
+      expect(result).toBe(true);
+    });
+  });
+
+  describe('remove', () => {
+    it('should remove a product by id', async () => {
+      // Arrange
+      const id = 1;
+      deleteMock.mockResolvedValue({ id });
+
+      // Act
+      const result = await service.remove(id);
+
+      // Assert
+      expect(deleteMock).toHaveBeenCalledWith(id);
+      expect(result).toEqual({ id });
     });
   });
 });

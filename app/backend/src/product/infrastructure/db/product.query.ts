@@ -19,8 +19,6 @@ export class ProductQuery {
       throw new Error(error.message);
     }
 
-    console.log(createProductDto);
-
     return createProductDto as Product;
   }
 
