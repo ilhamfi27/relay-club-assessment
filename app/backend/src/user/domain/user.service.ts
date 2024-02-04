@@ -1,9 +1,4 @@
-import { SupabaseProvider } from '@/supabase/supabase.provider';
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
   UserLoginDto,
@@ -12,12 +7,13 @@ import {
 import { hashString } from '@/common/hash';
 import { RequestContext } from '@/common/request-context';
 import { awaitToError } from '@/common/await-to-error';
+import { UserQuery } from '../infrastructure/db/user.query';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly supabase: SupabaseProvider,
+    private readonly userQuery: UserQuery,
   ) {}
 
   async login(user: UserLoginDto) {
@@ -40,18 +36,12 @@ export class UserService {
 
   async createUser(userData: UserRegisterDto) {
     userData.password = hashString(userData.password);
-    const { data, error } = await this.supabase
-      .from('users')
-      .insert([{ ...userData }]);
-    if (error) {
-      throw new Error(error.message);
-    }
-    return data;
+    return this.userQuery.createUser(userData);
   }
 
   async me() {
     const { user } = RequestContext.getContext();
-    return this.findUserByUsername(user.username);
+    return this.userQuery.findUserByUsername(user.username);
   }
 
   async verifyToken(token: string) {
@@ -59,32 +49,13 @@ export class UserService {
     if (!decoded) {
       throw new UnauthorizedException();
     }
-    return this.findUserByUsername(decoded.username);
-  }
-
-  private async findUserByUsername(username: string, showPassword = false) {
-    const { data, error } = await this.supabase
-      .from('users')
-      .select('id, username, password, name, role')
-      .eq('username', username)
-      .single();
-
-    if (error) {
-      throw new NotFoundException();
-    }
-
-    if (showPassword) {
-      return data;
-    }
-
-    delete data.password;
-    return data;
+    return this.userQuery.findUserByUsername(decoded.username);
   }
 
   private async validateUser(username: string, password: string) {
     // Check if the user exists in Supabase or your user database
     const [err, user] = await awaitToError(
-      this.findUserByUsername(username, true),
+      this.userQuery.findUserByUsername(username, true),
     );
     if (err) {
       return null;

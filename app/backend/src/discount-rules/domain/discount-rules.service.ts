@@ -1,81 +1,28 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { DiscountRuleDto } from '../application/rest/discount-rules.request';
-import { SupabaseProvider } from '@/supabase/supabase.provider';
+import { DiscountRuleQuery } from '../infrastructure/db/discount-rule.query';
 
 @Injectable()
 export class DiscountRulesService {
-  constructor(private readonly supabase: SupabaseProvider) {}
+  constructor(private readonly discountRuleQuery: DiscountRuleQuery) {}
   async findAll() {
-    const { data } = await this.supabase.from('discount_rules').select(`
-      id,
-      rule_type,
-      quantity,
-      discount_value,
-      product:fk_discount_rules_product_id (
-        id,
-        sku,
-        price,
-        name
-      ),
-      discount_product:fk_discount_rules_discount_product_id (
-        id,
-        sku,
-        price,
-        name
-      )
-    `);
-    return data;
+    return this.discountRuleQuery.findAll();
   }
 
   async findOne(id: number) {
-    const { data, error } = await this.supabase
-      .from('discount_rules')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (error) {
-      throw new NotFoundException();
-    }
-
-    return data;
+    return this.discountRuleQuery.findOne(id);
   }
 
   async create(discountRuleData: DiscountRuleDto) {
-    const { data, error } = await this.supabase
-      .from('discount_rules')
-      .insert([discountRuleData]);
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    return data;
+    return this.discountRuleQuery.create(discountRuleData);
   }
 
   async update(id: number, discountRuleData: DiscountRuleDto) {
-    const { data, error } = await this.supabase
-      .from('discount_rules')
-      .update(discountRuleData)
-      .eq('id', id);
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    return data;
+    return this.discountRuleQuery.update(id, discountRuleData);
   }
 
   async remove(id: number) {
-    const { error } = await this.supabase
-      .from('discount_rules')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
+    await this.discountRuleQuery.remove(id);
     return { id };
   }
 }

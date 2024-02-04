@@ -3,64 +3,27 @@ import {
   CreateProductDto,
   UpdateProductDto,
 } from '../application/rest/product.request';
-import { SupabaseProvider } from '@/supabase/supabase.provider';
+import { ProductQuery } from '../infrastructure/db/product.query';
 
 @Injectable()
 export class ProductService {
-  constructor(private readonly supabase: SupabaseProvider) {}
+  constructor(private readonly productQuery: ProductQuery) {}
   async create(createProductDto: CreateProductDto) {
-    const { data, error } = await this.supabase
-      .from('products')
-      .insert([createProductDto]);
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    return data;
+    return this.productQuery.create(createProductDto);
   }
   async findAll() {
-    const { data } = await this.supabase.from('products').select('*');
-
-    return data;
+    return this.productQuery.findAll();
   }
   async findOne(id: number) {
-    const { data, error } = await this.supabase
-      .from('products')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    return data;
+    return this.productQuery.getProductById(id);
   }
 
   async update(id: number, updateProductDto: UpdateProductDto) {
-    const { data, error } = await this.supabase
-      .from('products')
-      .update(updateProductDto)
-      .eq('id', id);
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    return data;
+    return this.productQuery.update(id, updateProductDto);
   }
 
   async remove(id: number) {
-    const { error } = await this.supabase
-      .from('products')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
+    await this.productQuery.removeById(id);
     return { id };
   }
 }

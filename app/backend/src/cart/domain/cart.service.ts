@@ -1,94 +1,42 @@
 import { RequestContext } from '@/common/request-context';
-import { SupabaseProvider } from '@/supabase/supabase.provider';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AddToCartDto } from '../application/rest/cart.request';
 import { awaitToError } from '@/common/await-to-error';
-
-type Product = {
-  id: number;
-  sku: string;
-  price: number;
-};
-
-type DiscountRule = {
-  rule_type: string;
-  quantity: number;
-  discount_value: number;
-  product: Product;
-  discount_product: Product;
-};
-
-type Cart = {
-  quantity: number;
-  product: Product;
-};
+import { CartQuery } from '../infrastructure/db/cart.query';
+import { Cart } from '../model/entities/cart.entity';
+import { DiscountRuleQuery } from '@/discount-rules/infrastructure/db/discount-rule.query';
 
 @Injectable()
 export class CartService {
-  constructor(private readonly supabaseProvider: SupabaseProvider) {}
-
-  private async getCartByUser() {
-    const { user } = RequestContext.getContext();
-    const { data: cart, error } = await this.supabaseProvider
-      .from('carts')
-      .select('*')
-      .eq('user_id', user.id)
-      .single();
-
-    if (error || !cart) {
-      throw new NotFoundException('Cart not found');
-    }
-    return cart;
-  }
+  constructor(
+    private readonly cartQuery: CartQuery,
+    private readonly discountRuleQuery: DiscountRuleQuery,
+  ) {}
 
   async getCart() {
-    const cart = await this.getCartByUser();
+    const { user } = RequestContext.getContext();
+    const cart = await this.cartQuery.getCartByUser(user.id);
 
     // Fetch the products associated with the cart
-    const { data: products, error: productError } = await this.supabaseProvider
-      .from('carts_products')
-      .select('quantity, product:products (id, sku, name, price)')
-      .eq('cart_id', cart.id);
-
-    if (productError) {
-      throw new NotFoundException('Failed to fetch products for the cart');
-    }
-    return products as unknown as Cart[];
+    return this.cartQuery.getCartProducts(cart.id);
   }
 
   async addToCart({ product_id, quantity }: AddToCartDto): Promise<any> {
     const { user } = RequestContext.getContext();
     let err = null,
       cart = null;
-    [err, cart] = await awaitToError(this.getCartByUser());
+    [err, cart] = await awaitToError(this.cartQuery.getCartByUser(user.id));
     if (err) {
-      await this.supabaseProvider.from('carts').insert([{ user_id: user.id }]);
-      [err, cart] = await awaitToError(this.getCartByUser());
-    }
-    const { data: product, error: productError } = await this.supabaseProvider
-      .from('products')
-      .select('*')
-      .eq('id', product_id)
-      .single();
-
-    if (productError || !product) {
-      throw new NotFoundException('Product not found');
+      await this.cartQuery.initiateCart(user.id);
+      [err, cart] = await awaitToError(this.cartQuery.getCartByUser(user.id));
     }
 
     // Add the product to the cart or update the quantity
-    const { error: addToCartError } = await this.supabaseProvider
-      .from('carts_products')
-      .upsert([
-        {
-          cart_id: cart.id,
-          product_id: product_id,
-          quantity,
-        },
-      ]);
-
-    if (addToCartError) {
-      throw new Error('Failed to add product to cart');
-    }
+    await this.cartQuery.upsertCartProduct({
+      cart_id: cart.id,
+      product_id,
+      quantity,
+    });
 
     // Recalculate the total and update the cart
     const updatedCart = await this.getCart();
@@ -106,33 +54,8 @@ export class CartService {
     return totalData;
   }
 
-  private async getDiscountRules(): Promise<DiscountRule[]> {
-    // Fetch discount rules from Supabase
-    const { data: discountRules } = await this.supabaseProvider.from(
-      'discount_rules',
-    ).select(`
-        rule_type,
-        quantity,
-        discount_value,
-        product:fk_discount_rules_product_id (
-          id,
-          sku,
-          price,
-          name
-        ),
-        discount_product:fk_discount_rules_discount_product_id (
-          id,
-          sku,
-          price,
-          name
-        )
-      `);
-
-    return discountRules as unknown as DiscountRule[];
-  }
-
   private async calculateTotalPrice(productCart: Cart[]) {
-    const discountRules = await this.getDiscountRules();
+    const discountRules = await this.discountRuleQuery.findAll();
     const cart: Record<number, string> = {};
 
     productCart.forEach((c) => {
