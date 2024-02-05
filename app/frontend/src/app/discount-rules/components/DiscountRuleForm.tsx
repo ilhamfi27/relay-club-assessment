@@ -55,8 +55,6 @@ const DiscountRulesForm: FC<DiscountRulesFormProps> = ({
           onSubmitError && onSubmitError(err);
         });
     } else {
-      console.log(Number(formData.get('discount_product_id')));
-
       create(payload)
         .then((res) => {
           onSubmitSuccess && onSubmitSuccess(res);
